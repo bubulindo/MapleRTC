@@ -1,5 +1,4 @@
 #include "utility/rtc_util.h"
-#include "wirish.h"
 #include <time.h>
 
 
@@ -8,26 +7,30 @@
 
 class RTClock {
  public:
- 	//RTClock();
+ 	RTClock();
     RTClock(rtc_clk_src src ); 
-	//RTC(rtc_clk_src src, uint32 prescaler );//only needed in case we're not using the Maple. 
+
 	~RTClock(); 
-	void setTime (uint32 time_stamp);
-	//void setTime (struct tm * tstamp_ptr); 
 	
-	//struct tm* getTime(); 
-	uint32 getTime();
+
+	void setTime (time_t time_stamp);
+	void setTime (struct tm * tm_ptr); 
 	
-	void createAlarm(voidFuncPtr function, uint32 alarm_time_t); 
-	//void createAlarm(voidFuncPtr function, struct tm* alarm_tm);
+	struct tm* getTime(struct tm* tm_ptr); 
+	time_t getTime();
+	
+	void createAlarm(voidFuncPtr function, time_t alarm_time_t); 
+	void createAlarm(voidFuncPtr function, struct tm* alarm_tm);
 	
 	void attachSecondsInterrupt(voidFuncPtr function); 
-	void detachSecondsInterrupt(voidFuncPtr function);
+	void detachSecondsInterrupt();
+	
+	void setAlarmTime (tm * tm_ptr);
  //private:
 
 } ;
 
 
 
-#endif // _RTC_H_
+#endif // _RTCLOCK_H_
                                                                                         

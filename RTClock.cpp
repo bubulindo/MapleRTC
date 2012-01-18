@@ -30,18 +30,11 @@
 
 #include "RTClock.h"
 
-	/*RTC::RTC() {
-		rtc_init(RTCSEL_LSE);//LSE should be 32768 Hz.
-		rtc_set_prescaler_load(0x7fff); 
+	RTClock::RTClock() {
+		rtc_init(RTCSEL_HSE);//HSE should be 32768 Hz.
+		rtc_set_prescaler_load(0xf423); 
 		rtc_set_count(0);//initializing... just in case
-	}*/
-	
-	//only needed in case we're not using the Maple.
-	/*RTC::RTC(rtc_clk_src src, uint32 prescaler ) {
-		rtc_init(src);//HSE = 8/128MHz = 62500 Hz
-		rtc_set_prescaler_load((prescaler & 0xFFFFF)); //according to sheet clock/(prescaler + 1) = Hz 0xF423 = 62499
-		rtc_set_count(0);//initializing... just in case				
-	}*/
+	}
 
     RTClock::RTClock(rtc_clk_src src ) {
 	
@@ -76,25 +69,33 @@
 	rtc_set_count(0);//initializing... just in case
 	
 	}//end RTC
-	
-	
-	
-	
+
 	RTClock::~RTClock() {
 	//to implement
-	}	
+	}
 	
 	
-	void RTClock::setTime (uint32 time_stamp) {
+	void RTClock::setTime (time_t time_stamp) {
 		rtc_set_count(time_stamp);
 	}
-
 	
-	uint32 RTClock::getTime() {
+	void RTClock::setTime (struct tm* tm_ptr) {
+		rtc_set_count(mktime (tm_ptr));
+	}
+	
+	time_t RTClock::getTime() {
 		return rtc_get_count();
 	}
 	
-	void RTClock::createAlarm(voidFuncPtr function, uint32 alarm_time_t) {
+	struct tm*  RTClock::getTime(struct tm* tm_ptr) {
+		time_t res = rtc_get_count();
+		tm_ptr = localtime(&res); //why not gmtime? 
+		
+		
+		return tm_ptr;
+	}
+	
+	void RTClock::createAlarm(voidFuncPtr function, time_t alarm_time_t) {
 		rtc_set_alarm(alarm_time_t); //must be int... for standardization sake. 
 		rtc_attach_interrupt(RTC_ALARM_SPECIFIC_INTERRUPT, function);
 	}
@@ -102,29 +103,22 @@
 	void RTClock::attachSecondsInterrupt(voidFuncPtr function) {
 		rtc_attach_interrupt(RTC_SECONDS_INTERRUPT, function);
 	}
-	void RTClock::detachSecondsInterrupt(voidFuncPtr function) {
+	void RTClock::detachSecondsInterrupt() {
 		rtc_detach_interrupt(RTC_SECONDS_INTERRUPT);
 	}
 
+	
+	void RTClock::createAlarm(voidFuncPtr function, tm* alarm_tm) {
+		time_t alarm = mktime(alarm_tm);//convert to time_t
+		createAlarm(function, alarm);	
+	}
+	
+	
+//change alarm time	
+	void RTClock::setAlarmTime (tm * tm_ptr) {
+		time_t time = mktime(tm_ptr);//convert to time_t
+		rtc_set_alarm(time); //must be int... for standardization sake. 
+	}
+	
 
-	
-/*	void RTC::createAlarm(voidFuncPtr function, tm* alarm_tm) {
-	
-	time_t alarm = mktime(alarm_tm);//convert to time_t
-	
-	createAlarm(function, alarm);
-		
-	}*/
-	
-	/*	void RTC::setTime (tm * tm_ptr) {
-	
-	time_t time = mktime(tm_ptr);//convert to time_t
-	rtc_set_count(time); 
-	}*/
-	
-/*	tm* RTC::getTime() {
-	time_t time = getCount(); 
-	return localtime(&time); //return tm pointer
-	}*/
-	
 	
