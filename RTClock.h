@@ -9,7 +9,7 @@ class RTClock {
  public:
  	RTClock();
     RTClock(rtc_clk_src src ); 
-
+	RTClock(rtc_clk_src src, uint16 prescaler );
 	~RTClock(); 
 	
 

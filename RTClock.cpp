@@ -31,28 +31,36 @@
 #include "RTClock.h"
 
 	RTClock::RTClock() {
-		rtc_init(RTCSEL_HSE);//HSE should be 32768 Hz.
-		rtc_set_prescaler_load(0xf423); 
-		rtc_set_count(0);//initializing... just in case
+		//rtc_init(RTCSEL_HSE);//HSE should be .
+		//rtc_set_prescaler_load(0xf423); 
+		//rtc_set_count(0);//initializing... just in case
+		RTClock(RTCSEL_HSE, 0xf423);
 	}
 
-    RTClock::RTClock(rtc_clk_src src ) {
+    RTClock::RTClock(rtc_clk_src src) {
+	//uint16 prescal = 0x7fff; //just in case
 	
+	/*
 	switch (src) {
 	
 		case RTCSEL_LSE : {
-			rtc_init(RTCSEL_LSE);//LSE should be 32768 Hz.
-			rtc_set_prescaler_load(0x7fff); //according to sheet clock/(prescaler + 1) = Hz
+			//rtc_init(RTCSEL_LSE);//LSE should be 32768 Hz.
+			//rtc_set_prescaler_load(0x7fff); //according to sheet clock/(prescaler + 1) = Hz
+			prescal = 0x7fff;
+			
+			
 			break;
 			}
 		case RTCSEL_LSI : {
-			rtc_init(RTCSEL_LSI);//LSI is around 40000 Hz (between 30000 and 60000).
-			rtc_set_prescaler_load(0x9C3F); //according to sheet clock/(prescaler + 1) = Hz 39999Hz = 0x9C3F
+			//rtc_init(RTCSEL_LSI);//LSI is around 40000 Hz (between 30000 and 60000).
+			//rtc_set_prescaler_load(0x9C3F); //according to sheet clock/(prescaler + 1) = Hz 39999Hz = 0x9C3F
+			prescal = 0x9C3F; 
 			break;
 			}
 		case RTCSEL_HSE : {
-			rtc_init(RTCSEL_HSE);//HSE = 8/128MHz = 62500 Hz
-			rtc_set_prescaler_load(0xF423); //according to sheet clock/(prescaler + 1) = Hz 0xF423 = 62499
+			//rtc_init(RTCSEL_HSE);//HSE = 8/128MHz = 62500 Hz
+			//rtc_set_prescaler_load(0xF423); //according to sheet clock/(prescaler + 1) = Hz 0xF423 = 62499
+			prescal = 0xf423; 
 			break;
 			}
 		case RTCSEL_DEFAULT: {
@@ -66,9 +74,48 @@
 		
 		}//end switch
 	
-	rtc_set_count(0);//initializing... just in case
+	*/
+	
+	//rtc_set_count(0);//initializing... not needed. 
+	
+	RTClock(src, 0);
 	
 	}//end RTC
+
+	RTClock::RTClock(rtc_clk_src src, uint16 prescaler ) {
+		switch (src) {
+	
+		case RTCSEL_LSE : {
+			rtc_init(RTCSEL_LSE);//LSE should be 32768 Hz.
+			if (prescaler != 0) rtc_set_prescaler_load(prescaler); //according to sheet clock/(prescaler + 1) = Hz
+			else rtc_set_prescaler_load(0x7fff);
+			break;
+			}
+		case RTCSEL_LSI : {
+			rtc_init(RTCSEL_LSI);//LSI is around 40000 Hz (between 30000 and 60000).
+			if (prescaler != 0) rtc_set_prescaler_load(prescaler); //according to sheet clock/(prescaler + 1) = Hz 39999Hz = 0x9C3F
+			else rtc_set_prescaler_load(0x9C3F);
+			break;
+			}
+		case RTCSEL_HSE : {
+			rtc_init(RTCSEL_HSE);//HSE = 8/128MHz = 62500 Hz
+			if (prescaler != 0) rtc_set_prescaler_load(prescaler); //according to sheet clock/(prescaler + 1) = Hz 0xF423 = 62499
+			else rtc_set_prescaler_load(0xF423);
+			break;
+			}
+		case RTCSEL_DEFAULT: {
+			//do nothing. Have a look at the clocks to see the diff between NONE and DEFAULT
+			break;
+			}
+		case RTCSEL_NONE: {
+			//do nothing. Have a look at the clocks to see the diff between NONE and DEFAULT
+			break;
+			}
+		
+		}//end switch
+	
+
+	}
 
 	RTClock::~RTClock() {
 	//to implement
