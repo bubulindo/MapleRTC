@@ -31,54 +31,11 @@
 #include "RTClock.h"
 
 	RTClock::RTClock() {
-		//rtc_init(RTCSEL_HSE);//HSE should be .
-		//rtc_set_prescaler_load(0xf423); 
-		//rtc_set_count(0);//initializing... just in case
 		RTClock(RTCSEL_HSE, 0xf423);
 	}
 
     RTClock::RTClock(rtc_clk_src src) {
-	//uint16 prescal = 0x7fff; //just in case
-	
-	/*
-	switch (src) {
-	
-		case RTCSEL_LSE : {
-			//rtc_init(RTCSEL_LSE);//LSE should be 32768 Hz.
-			//rtc_set_prescaler_load(0x7fff); //according to sheet clock/(prescaler + 1) = Hz
-			prescal = 0x7fff;
-			
-			
-			break;
-			}
-		case RTCSEL_LSI : {
-			//rtc_init(RTCSEL_LSI);//LSI is around 40000 Hz (between 30000 and 60000).
-			//rtc_set_prescaler_load(0x9C3F); //according to sheet clock/(prescaler + 1) = Hz 39999Hz = 0x9C3F
-			prescal = 0x9C3F; 
-			break;
-			}
-		case RTCSEL_HSE : {
-			//rtc_init(RTCSEL_HSE);//HSE = 8/128MHz = 62500 Hz
-			//rtc_set_prescaler_load(0xF423); //according to sheet clock/(prescaler + 1) = Hz 0xF423 = 62499
-			prescal = 0xf423; 
-			break;
-			}
-		case RTCSEL_DEFAULT: {
-			//do nothing. Have a look at the clocks to see the diff between NONE and DEFAULT
-			break;
-			}
-		case RTCSEL_NONE: {
-			//do nothing. Have a look at the clocks to see the diff between NONE and DEFAULT
-			break;
-			}
-		
-		}//end switch
-	
-	*/
-	
-	//rtc_set_count(0);//initializing... not needed. 
-	
-	RTClock(src, 0);
+		RTClock(src, 0);
 	
 	}//end RTC
 
@@ -117,10 +74,11 @@
 
 	}
 
+/*
 	RTClock::~RTClock() {
 	//to implement
 	}
-	
+*/	
 	
 	void RTClock::setTime (time_t time_stamp) {
 		rtc_set_count(time_stamp);
@@ -136,9 +94,7 @@
 	
 	struct tm*  RTClock::getTime(struct tm* tm_ptr) {
 		time_t res = rtc_get_count();
-		tm_ptr = localtime(&res); //why not gmtime? 
-		
-		
+		tm_ptr = gmtime(&res); //why not gmtime? 
 		return tm_ptr;
 	}
 	
@@ -159,13 +115,17 @@
 		time_t alarm = mktime(alarm_tm);//convert to time_t
 		createAlarm(function, alarm);	
 	}
-	
-	
+
 //change alarm time	
 	void RTClock::setAlarmTime (tm * tm_ptr) {
 		time_t time = mktime(tm_ptr);//convert to time_t
 		rtc_set_alarm(time); //must be int... for standardization sake. 
 	}
+
+	void RTClock::setAlarmTime (time_t alarm_time) {
 	
+		rtc_set_alarm(alarm_time);
+	
+	}
 
 	

@@ -5,12 +5,16 @@
 #ifndef _RTCLOCK_H_
 #define _RTCLOCK_H_
 
+
+
+
+
 class RTClock {
  public:
  	RTClock();
     RTClock(rtc_clk_src src ); 
 	RTClock(rtc_clk_src src, uint16 prescaler );
-	~RTClock(); 
+	//~RTClock(); //to implement
 	
 
 	void setTime (time_t time_stamp);
@@ -26,6 +30,7 @@ class RTClock {
 	void detachSecondsInterrupt();
 	
 	void setAlarmTime (tm * tm_ptr);
+	void setAlarmTime (time_t alarm_time); 
  //private:
 
 } ;

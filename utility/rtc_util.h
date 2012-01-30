@@ -34,17 +34,17 @@
 #ifndef _RTC_UTIL_H
 #define _RTC_UTIL_H
 
-#include "libmaple.h"
-#include "rcc.h"
-#include "nvic.h"
-#include "bitband.h"
-#include "pwr.h"
-#include "bkp.h"
-#include "exti.h"
+#include <libmaple.h>
+#include <rcc.h>
+#include <nvic.h>
+#include <bitband.h>
+#include <pwr.h>
+#include <bkp.h>
+#include <exti.h>
 
 #define EXTI_RTC_ALARM_BIT		17						// the extra exti interrupts (16,17,18,19) should be defined in exti.h (BUG)
 
-#define RCC_BDCR_RTCSEL_LSI   (0x2 << 8)
+//#define RCC_BDCR_RTCSEL_LSI   (0x2 << 8)
 
 
 #ifdef __cplusplus
@@ -252,44 +252,6 @@ static inline int rtc_is_overflow() {
 	return *bb_perip(&(RTC->regs)->CRL, RTC_CRL_OWF_BIT);
 }
 
-
-//-------------------------------------------------------------
-
-static inline void rcc_start_lsi(void) {
-	*bb_perip(&RCC_BASE->CSR, RCC_CSR_LSION_BIT) = 1;
-	while (*bb_perip(&RCC_BASE->CSR, RCC_CSR_LSIRDY_BIT) == 0);
-}
-
-/**
- * @brief Stop the low speed internal oscillatior
- */
-static inline void rcc_stop_lsi(void) {
-	*bb_perip(&RCC_BASE->CSR, RCC_CSR_LSION_BIT) = 0;
-}
-
-/**
- * @brief Start the low speed external oscillatior
- */
-static inline void rcc_start_lse(void) {
-	bb_peri_set_bit(&RCC_BASE->BDCR, RCC_BDCR_LSEBYP_BIT, 0);
-	bb_peri_set_bit(&RCC_BASE->BDCR, RCC_BDCR_LSEON_BIT, 1);
-	while (bb_peri_get_bit(&RCC_BASE->BDCR, RCC_BDCR_LSERDY_BIT ) == 0);
-}
-
-/**
- * @brief Stop the low speed external oscillatior
- */
-static inline void rcc_stop_lse(void) {
-	bb_peri_set_bit(&RCC_BASE->BDCR, RCC_BDCR_LSEON, 0);
-}
-
-/**
- * @brief Start the high speed external oscillatior
- */
-static inline void rcc_start_hse(void) {
-//	*bb_perip(&RCC_BASE->CR, RCC_CR_HSEON_BIT) = 1;
-	while (bb_peri_get_bit(&RCC_BASE->CR, RCC_CR_HSERDY_BIT) == 0);
-}
 
 	
 #ifdef __cplusplus
